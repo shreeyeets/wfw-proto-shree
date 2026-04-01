@@ -1,0 +1,34 @@
+Setup
+
+ npx create-next-app@latest wysa-teams-proto --typescript --tailwind --app
+ Install openai package
+ Create .env.local with OPENAI_API_KEY=your_key
+ Add .env.local to .gitignore
+
+Backend — API route
+
+ Create app/api/chat/route.ts
+ Accept { system, messages } in POST body
+ Call GPT-4o mini via OpenAI SDK (gpt-4o-mini, max_tokens: 1000)
+ Return { content: string }
+ Add basic rate limiting (optional but recommended before sharing)
+
+Frontend
+
+ Port WysaTeams.jsx into app/page.tsx (or a component)
+ Replace all callClaude() calls with fetch('/api/chat', { method:'POST', body: JSON.stringify({ system, messages }) })
+ Make sure .env key is never exposed client-side — all OpenAI calls go server-side through the API route only
+
+Deploy
+
+ Push to GitHub
+ Connect repo to Vercel
+ Add OPENAI_API_KEY in Vercel project settings → Environment Variables
+ Deploy — Vercel auto-builds on every push
+
+Claude Code workflow
+
+Open your project folder in terminal and run claude. Give it the WysaTeams.jsx file and tell it to do the port. It'll handle the Next.js boilerplate, the API route, and the fetch swap in one shot. Should take under 30 minutes end to end.
+
+One thing to watch: the system prompts are currently long strings inside the component. Worth asking Claude Code to move them into constants in a separate lib/prompts.ts file so they're easier to iterate on without touching component logic.
+

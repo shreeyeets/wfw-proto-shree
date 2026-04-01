@@ -1,0 +1,94 @@
+Shreejeet's Canvas
+
+Why products fail:
+
+1. They're built for the buyer, not the user: The HR team or C-suite buys the product and designs the rollout. The employee had zero input. It arrives as a mandate. Psychologically, anything that feels mandated is immediately suspect — "why does the company want to know how I'm feeling?" The trust is gone before day one.
+2. They ask for vulnerability with no safety: Mood trackers, mental health check-ins, "how are you really doing" surveys — these ask employees to be honest in an environment where honesty has historically had consequences. Even if the data is "anonymous," employees don't believe it. And they're not irrational to be skeptical.
+3. The payoff is too distant or too vague: "This will help your wellbeing long-term." That's not a reason to open an app on a Tuesday morning. The immediate experience of using the product has to be worth it on its own — today, right now. Most tools can't answer the question: "what did I get out of that 2 minutes?"
+4. They oversimplify the human experience: A 1-5 mood slider, a burnout score, a wellness percentage — these reduce something deeply complex and personal to a number. Employees feel patronised by it. Their inner life isn't a metric. The best products make people feel understood, not measured.
+5. :star:️They create obligation without habit: There's a big difference between a habit and an obligation. Obligations are things you do because you'll feel bad if you don't. Habits are things you do because something feels missing if you don't. Almost all wellness tools create obligation. Almost none create habit. The difference is whether the product gives you something you actually want each time you use it.
+6. :star:️They're disconnected from real work: A meditation app that sits next to your work tools but has nothing to do with what's actually happening in your day. The problem is at work. The solution shouldn't require you to mentally step outside work to access it. The best products meet people where the pain is.
+7. The company's presence poisons the well: Even a genuinely good, private, employee-facing tool gets tainted if it's perceived as the company watching. The framing of "your employer provided this for you" activates suspicion regardless of actual privacy protections. This is a distribution and positioning problem as much as a product problem.
+
+
+The problems employees actually have:
+
+1. The gap between how they present and how they feel Most employees are performing okayness. In meetings, on Slack, in 1:1s — they're fine. The gap between their public face and their private experience is enormous and exhausting to maintain. They have no sanctioned space to close that gap, so it just widens over time.
+2. Work has eaten their identity Especially post-pandemic. The boundaries collapsed and never fully came back. Many employees — particularly high performers — have quietly lost track of who they are outside their job title. Their sense of self-worth is entirely tied to performance. That's fragile and exhausting.
+3. :star: The feeling of invisible effort A huge amount of work — coordination, emotional labor, mentoring, holding things together — is never acknowledged, never shows up in a review, and never gets rewarded. People feel this deeply. It's not just unfairness. It's invisibility. And invisibility at work is a slow poison.
+4. No real recovery Not "work-life balance" in the brochure sense. The actual physiological and psychological inability to switch off. The ambient anxiety of an unread Slack message. The Sunday dread. People don't recover between days, let alone between weeks. They're running a permanent deficit and have normalised it.
+5. They can't locate the source of their unhappiness Is it the job? The manager? The team? Their own expectations? Life outside work bleeding in? Most people genuinely don't know. They just feel a vague wrongness they can't diagnose. And because they can't diagnose it, they can't fix it. They either quit, or they numb it. → Investors might not enjoy this
+6. Relationship with their manager is the whole game Gallup's most replicated finding: people leave managers, not companies. A bad manager doesn't just make work unpleasant — they make the employee feel unseen, undervalued, and stuck. But there's almost no safe, structured way for an employee to surface this friction upward. → HR Problem not Wellness
+7. Career drift and loss of meaning Especially mid-career. The job pays okay, isn't terrible, but somewhere along the way the meaning drained out. They can't justify quitting. They can't get excited about staying. They're in a kind of professional limbo that's very hard to talk about because it sounds ungrateful. → I don’t think investors care
+
+
+Problems I picked (in detail):
+
+1. The performing okayness gap is probably the deepest and least addressed. Every product tries to get employees to be honest about how they feel. None of them solve the reason employees aren't honest in the first place — which is that the environment doesn't feel safe for honesty. Any product that tries to extract real feeling without first creating real safety will fail the same way.
+2. Work has eaten their identity is real but subtle. The reason it matters for a product is that it creates a specific kind of pain — employees who are high-performing but secretly hollow. They won't self-identify as needing "wellness help." They'll bristle at that framing. But they will respond to something that reconnects them to their own agency and sense of self — if it doesn't feel therapeutic.
+3. :star: Invisible effort is the most emotionally charged of the four. It's connected to fairness, dignity, and being seen. Products that touch this tend to create strong loyalty because they're addressing something that feels deeply personal and chronically unmet.
+4. No real recovery is the most physiologically grounded. There's hard science here — cognitive fatigue, cortisol, sleep debt. The problem is that most products that address this feel like they're lecturing employees to take better care of themselves, which is condescending when the system is what's not allowing recovery. Any product here has to be careful not to put the blame on the individual.
+
+
+These four problems aren't separate. They're a chain. The inability to recover → erodes identity → widens the performing gap → makes invisible effort feel even more painful. A product that only solves one of them in isolation will feel incomplete to the employee.
+The question is: what is the single daily moment that, if a product owned it well, would naturally touch all four?
+
+What is a "performance infrastructure" an employee would want to use everyday?
+
+I came up with this flow of 7 questions and answered 3 of them (worked with claude) that will eventually lead us to our product:
+
+What is the style of involvement of the product?
+Passive: Detects patterns, provides insights, suggests habits
+Active: User Interaction App (Wysa)
+Hybrid (See first attachment): :white_check_mark:
+Timely Check-Ins
+Insights/Habits Provided
+
+
+:star:What is a product an employee would want to use everyday?:star:
+See second attachment (brainstorming done)
+Can consider sending out google forms to get structured+diverse answers
+
+What does a performance infrastructure constitute (ranked)?
+Smart Task Management: Knowing what you’re actually taking on before taking it on
+Scoping things out
+Prioritising
+Sequencing
+
+Energy & Capacity Awareness: 
+Knowing when you're actually able to do deep work vs when you're running on fumes
+Not just "I'm tired", but also why and what to do about it
+
+Context Switching Cost:
+How much are you fragmenting? 
+What's the real cost of jumping between things?
+Research backed ROI here
+Most people have no visibility into this
+
+
+:star2:Invisible Work Recognition: Work that doesn't show up in any task list but ate your week
+Meetings
+Helping/testing for others
+Async reviews
+
+Growth & Skill Development:
+Are you actually getting better at things or just repeating tasks?
+
+Relationships & Collaboration Load:
+Who are you carrying? 
+Who's carrying you? 
+Is it balanced?
+
+
+What are employee issues related to performance management?
+TBD based on 3
+
+What does "instant payoff" for an employee (from a performance infrastructure) look like?
+TBD: We find solutions based on 4
+We pick the aha moment here
+
+How does this carry forward from an individual user to the team?
+TBD based on 5
+
+How does this look as a product?
+TBD based on 5 and 6
