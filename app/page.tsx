@@ -22,110 +22,23 @@ import {
   uc2ButtonsUserPrompt,
   uc2ToolExplainPrompt,
 } from '@/lib/prompts';
+import { PURPLE } from '@/components/teams-shell/constants';
+import { Avatar } from '@/components/teams-shell/Avatar';
+import { TypingDots } from '@/components/teams-shell/TypingDots';
+import { Message } from '@/components/teams-shell/Message';
+import { QRButton } from '@/components/teams-shell/QRButton';
+import { TeamsTop } from '@/components/teams-shell/TeamsTop';
+import { ChatMessage, QuickReply, WysaTool } from '@/components/teams-shell/types';
+import { callAI } from '@/lib/callAI';
 
-const PURPLE = '#6264A7';
-const SLOT_ORDER = ['10:00–11:00', '12:30–1:30', '4:30–5:00'];
-const SLOT_NOTES: Record<string, string> = {
-  '10:00–11:00': '10:00–11:00 — freshest hour, nothing before it. Best for anything needing real thinking.',
-  '12:30–1:30': '12:30–1:30 — right after 2 back-to-back meetings end. Give it 5 min before diving in.',
-  '4:30–5:00': '4:30–5:00 — tight 30 min. Wrap up loose ends only, don\'t start anything new.',
-};
-
-interface WysaTool {
-  name: string;
-  triggers: string[];
-  url: string;
-}
-
-const WYSA_TOOLS: WysaTool[] = [
-  { name: 'CBT to Beat Stress', triggers: ['stressed', 'anxious', 'overwhelmed', 'panic', "can't think", 'head is full', 'too much', 'spiralling', 'stress', 'anxiety'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
-  { name: 'Planning a Difficult Conversation', triggers: ['conversation', 'talk to', 'manager', 'feedback', 'confrontation', 'difficult', 'awkward', 'colleague'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
-  { name: 'Finding Your Strengths', triggers: ['meaning', 'lost', 'purpose', 'identity', 'what am i doing', 'not sure anymore'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
-  { name: 'Progressive Relaxation', triggers: ['tense', 'tight', "can't relax", 'wound up', 'physical', 'body'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
-];
-
-const CLOSING_MSG = "I'll check in later in the day — come back if you need anything before then.";
-
-interface ChatMessage {
-  id: number;
-  from: 'user' | 'wysa';
-  text: string;
-  visible: boolean;
-  card?: boolean;
-  widget?: WysaTool;
-}
-
-interface QuickReply {
-  type?: string;
-  label?: string;
-  action?: () => void;
-}
-
-interface FlowState {
-  slotSelectMode?: boolean;
-  protectedSlots?: string[];
-  assignMode?: boolean;
-  assignSlots?: string[];
-  assignIdx?: number;
-  assignedTasks?: string[];
-  triageMode?: boolean;
-  triageHistory?: Array<{ role: string; content: string }>;
-  uc2History?: Array<{ role: string; content: string }>;
-  uc2Step?: number;
-  uc2WaitInput?: boolean;
-  lightDayInputMode?: boolean;
-}
-
+// detectTool is UC2-specific — lives here since it references local WYSA_TOOLS
 function detectTool(text: string): WysaTool | null {
   const lower = text.toLowerCase();
   for (const t of WYSA_TOOLS) if (t.triggers.some(k => lower.includes(k))) return t;
   return null;
 }
 
-async function callAI(system: string, messages: Array<{ role: string; content: string }>): Promise<string> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system, messages }),
-      signal: controller.signal,
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    return data.content;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
 // ── COMPONENTS ────────────────────────────────────────────────────────────────
-
-function Avatar({ type, initial }: { type: 'wysa' | 'user'; initial: string }) {
-  const bg = type === 'wysa' ? PURPLE : '#237B4B';
-  return (
-    <div style={{ width: 26, height: 26, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff', fontWeight: 600, flexShrink: 0, marginTop: 2 }}>
-      {initial}
-    </div>
-  );
-}
-
-function TypingDots() {
-  return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-      <Avatar type="wysa" initial="W" />
-      <div>
-        <div style={{ fontSize: 11, color: '#aaa', marginBottom: 2 }}>Wysa for Teams</div>
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center', padding: '10px 13px', background: '#f4f4f4', borderRadius: 12, border: '1px solid #ebebeb' }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#aaa', animation: `tdot 1.2s ${i * 0.2}s infinite` }} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function InsightCard() {
   const rows = [
@@ -147,54 +60,38 @@ function InsightCard() {
   );
 }
 
-function Message({ msg }: { msg: ChatMessage }) {
-  const isUser = msg.from === 'user';
-  return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexDirection: isUser ? 'row-reverse' : 'row', opacity: msg.visible ? 1 : 0, transform: msg.visible ? 'translateY(0)' : 'translateY(6px)', transition: 'opacity 0.3s ease,transform 0.3s ease' }}>
-      <Avatar type={isUser ? 'user' : 'wysa'} initial={isUser ? 'S' : 'W'} />
-      <div style={{ maxWidth: '76%', display: 'flex', flexDirection: 'column' }}>
-        {!isUser && <div style={{ fontSize: 11, color: '#aaa', marginBottom: 2 }}>Wysa for Teams</div>}
-        <div style={{ padding: '9px 13px', borderRadius: 12, fontSize: 13, lineHeight: 1.6, color: isUser ? '#fff' : '#1a1a1a', background: isUser ? PURPLE : '#f4f4f4', border: isUser ? 'none' : '1px solid #ebebeb', whiteSpace: 'pre-wrap' }}>
-          {msg.text}
-          {msg.card && <InsightCard />}
-          {msg.widget && (
-            <div>
-              <br />
-              <a href={msg.widget.url} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 4, background: PURPLE, color: '#fff', padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
-                Open: {msg.widget.name} →
-              </a>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function QRButton({ label, onClick }: { label: string; onClick: () => void }) {
-  const [hov, setHov] = useState(false);
-  return (
-    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background: hov ? '#f0f0f8' : '#fff', border: `1px solid ${PURPLE}`, color: PURPLE, borderRadius: 20, padding: '5px 13px', fontSize: 12, cursor: 'pointer', transition: 'background 0.15s' }}>
-      {label}
-    </button>
-  );
-}
-
-function TeamsTop({ activeTab }: { activeTab: string }) {
-  return (
-    <div style={{ background: '#464775', padding: '0 16px', height: 44, display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
-      <div style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>Microsoft Teams</div>
-      <div style={{ display: 'flex', gap: 20 }}>
-        {['Activity', 'Chat', 'Teams', 'Calendar'].map(t => (
-          <span key={t} style={{ color: t === activeTab ? '#fff' : 'rgba(255,255,255,0.55)', fontSize: 12, borderBottom: t === activeTab ? '2px solid #fff' : 'none', paddingBottom: 2 }}>{t}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
+
+const SLOT_ORDER = ['10:00–11:00', '12:30–1:30', '4:30–5:00'];
+const SLOT_NOTES: Record<string, string> = {
+  '10:00–11:00': '10:00–11:00 — freshest hour, nothing before it. Best for anything needing real thinking.',
+  '12:30–1:30': '12:30–1:30 — right after 2 back-to-back meetings end. Give it 5 min before diving in.',
+  '4:30–5:00': '4:30–5:00 — tight 30 min. Wrap up loose ends only, don\'t start anything new.',
+};
+
+const WYSA_TOOLS: WysaTool[] = [
+  { name: 'CBT to Beat Stress', triggers: ['stressed', 'anxious', 'overwhelmed', 'panic', "can't think", 'head is full', 'too much', 'spiralling', 'stress', 'anxiety'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
+  { name: 'Planning a Difficult Conversation', triggers: ['conversation', 'talk to', 'manager', 'feedback', 'confrontation', 'difficult', 'awkward', 'colleague'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
+  { name: 'Finding Your Strengths', triggers: ['meaning', 'lost', 'purpose', 'identity', 'what am i doing', 'not sure anymore'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
+  { name: 'Progressive Relaxation', triggers: ['tense', 'tight', "can't relax", 'wound up', 'physical', 'body'], url: 'https://dev-widget.wysa.io/wrapper/accenture/' },
+];
+
+const CLOSING_MSG = "I'll check in later in the day — come back if you need anything before then.";
+
+interface FlowState {
+  slotSelectMode?: boolean;
+  protectedSlots?: string[];
+  assignMode?: boolean;
+  assignSlots?: string[];
+  assignIdx?: number;
+  assignedTasks?: string[];
+  triageMode?: boolean;
+  triageHistory?: Array<{ role: string; content: string }>;
+  uc2History?: Array<{ role: string; content: string }>;
+  uc2Step?: number;
+  uc2WaitInput?: boolean;
+  lightDayInputMode?: boolean;
+}
 
 export default function App() {
   const [screen, setScreen] = useState<'landing' | 'teams' | 'chat'>('landing');
@@ -794,9 +691,18 @@ export default function App() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
       <div style={{ width: '100%', background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 40, padding: '60px 40px', minHeight: '100vh' }}>
         <div style={{ fontSize: 20, fontWeight: 600, color: PURPLE, letterSpacing: 1.5, textTransform: 'uppercase' }}>Wysa for Teams</div>
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center', width: '100%', maxWidth: 800 }}>
-          {[{ id: 'uc1' as const, label: 'Morning check-in' }, { id: 'uc2' as const, label: "I'm overwhelmed" }].map(c => (
-            <div key={c.id} onClick={() => { setUc(c.id); setScreen('teams'); }}
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center', width: '100%', maxWidth: 1000 }}>
+          {[
+            { id: 'uc1' as const, label: 'Morning check-in' },
+            { id: 'uc2' as const, label: "I'm overwhelmed" },
+            { id: 'uc3' as const, label: "UC3 · Team digest" },
+            { id: 'uc_hub' as const, label: 'Wellbeing Toolkit' },
+          ].map(c => (
+            <div key={c.id} onClick={() => {
+              if (c.id === 'uc3') window.location.href = '/uc3';
+              else if (c.id === 'uc_hub') window.location.href = '/uc_hub';
+              else { setUc(c.id as 'uc1' | 'uc2'); setScreen('teams'); }
+            }}
               style={{ flex: 1, minWidth: 280, border: '2px solid #e0e0e0', borderRadius: 16, padding: '48px 32px', cursor: 'pointer', background: '#fff', transition: 'border-color 0.15s, transform 0.1s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = PURPLE; e.currentTarget.style.transform = 'scale(1.02)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.transform = 'scale(1)'; }}>
@@ -874,7 +780,7 @@ export default function App() {
           </div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {messages.map(m => <Message key={m.id} msg={m} />)}
+          {messages.map(m => <Message key={m.id} msg={m}>{m.card && <InsightCard />}</Message>)}
           {typing && <TypingDots />}
           <div ref={msgsEndRef} />
         </div>

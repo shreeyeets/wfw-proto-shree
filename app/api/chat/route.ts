@@ -16,7 +16,14 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    return NextResponse.json({ content: completion.choices[0].message.content ?? '' });
+    const content = completion.choices[0].message.content ?? '';
+    if (content.toLowerCase().includes('serious') || content.toLowerCase().includes('okay')) {
+      console.log('--- DEBUG [AI Response] ---');
+      console.log(content);
+      console.log('---------------------------');
+    }
+
+    return NextResponse.json({ content });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error('[/api/chat]', message);

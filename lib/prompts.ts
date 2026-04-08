@@ -87,3 +87,77 @@ export function calendarEventTitleSystem(task: string): string {
 export function uc1AssignTaskReframeSystem(task: string, duration: number): string {
   return fill(data.assign_task_reframe_system, { task, duration: String(duration) });
 }
+
+// ── UC3 ────────────────────────────────────────────────────────────────────
+
+const uc3 = (data as Record<string, any>).uc3;
+
+/** Main conversational system prompt — injected with live team context. */
+export function uc3TeamQuerySystem(
+  manager: string,
+  week: string,
+  teamSummary: string,
+  anonymousSignals: string,
+): string {
+  return fill(uc3.team_query_system, { manager, week, teamSummary, anonymousSignals });
+}
+
+/** One-sentence opening hook — used for the bot's first text after the summary card. */
+export function uc3TeamSummarySystem(teamSummary: string): string {
+  return fill(uc3.team_summary_system, { teamSummary });
+}
+
+/** System prompt for the button-generation LLM call. */
+export const UC3_BUTTONS_SYSTEM: string = uc3.buttons_system;
+
+/** User payload for the button-generation call — fills {{history}} and {{lastBot}}. */
+export function uc3ButtonsUserPrompt(history: string, lastBot: string): string {
+  return fill(uc3.buttons_user_prompt, { history, lastBot });
+}
+
+/** LLM-generated fix suggestion — injected with team summary data. */
+export function uc3FixOfferSystem(teamSummary: string): string {
+  return fill(uc3.fix_offer_system, { teamSummary });
+}
+
+// ── UC_HUB ─────────────────────────────────────────────────────────────────
+
+const ucHubData = (data as Record<string, any>).uc_hub;
+
+// Valid resource keys the LLM may return — kept here so the format injection
+// and the page's HUB_RESOURCES object stay in sync without a separate config file.
+const HUB_RESOURCE_KEYS_LIST =
+  'wysa, rethink_care_coaching, rethink_care_parenting, rethink_care_neuro, nudge, ' +
+  'calm_mindfulness, sober_sidekick, uptime, mental_health_ally, eap, in_app_self_care';
+
+/**
+ * Hub main system prompt.
+ * Wraps hub_system from prompts.json and appends a strict JSON output format
+ * that adds `care_type` and enumerates valid resource keys.
+ */
+export function ucHubSystem(): string {
+  const base: string = ucHubData.hub_system;
+  return (
+    base +
+    `\n\nCRITICAL — override the output format above. Return ONLY this JSON:\n` +
+    `{"msg":"your sentence","care_type":"NA","specific_resource_redirected":"NA","specific_resource_handoff":false}\n` +
+    `With a resource: {"msg":"your response","care_type":"specific_resource","specific_resource_redirected":"resource_key","specific_resource_handoff":false}\n` +
+    `For crisis: {"msg":"your response","care_type":"crisis","specific_resource_redirected":"eap","specific_resource_handoff":true}\n` +
+    `Valid resource keys (exact): ${HUB_RESOURCE_KEYS_LIST}\n` +
+    `Set care_type to "crisis" ONLY for suicidal ideation, self-harm, or acute safety risk.\n` +
+    `specific_resource_redirected is NA for all regular conversational turns.`
+  );
+}
+
+/** Static system prompt for Hub button generation. */
+export const UC_HUB_BUTTONS_SYSTEM: string = ucHubData.buttons_system;
+
+/** User payload for the Hub button-generation call. */
+export function ucHubButtonsUserPrompt(history: string, lastBot: string): string {
+  return fill(ucHubData.buttons_user_prompt, { history, lastBot });
+}
+
+/** Post-tool follow-up system prompt. */
+export function ucHubToolFollowupSystem(toolName: string): string {
+  return fill(ucHubData.tool_followup_system, { toolName });
+}
